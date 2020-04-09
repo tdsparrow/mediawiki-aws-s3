@@ -240,6 +240,8 @@ class AmazonS3FileBackendTest extends MediaWikiTestCase {
 	 * @dataProvider listingTestsDataProvider
 	 * @covers AmazonS3FileBackend::getDirectoryListInternal
 	 * @covers AmazonS3FileBackend::getFileListInternal
+	 * @covers AmazonS3FileBackend::doDirectoryExists
+	 * @covers AmazonS3FileBackend::getS3ListPaginator
 	 */
 	public function testList( $method, $directory, $params, $expectedResult ) {
 		$testinfo = $this->prepareListTest();
@@ -266,6 +268,7 @@ class AmazonS3FileBackendTest extends MediaWikiTestCase {
 	/**
 	 * Check that doGetLocalCopyMulti() provides correct content.
 	 * @covers AmazonS3FileBackend::doGetLocalCopyMulti
+	 * @covers AmazonS3FileBackend::getLocalCopyCached
 	 */
 	public function testGetLocalCopyMulti() {
 		$testinfo = $this->prepareListTest();
@@ -360,6 +363,9 @@ class AmazonS3FileBackendTest extends MediaWikiTestCase {
 	 * Check that doSecureInternal() and doPublishInternal() succeed.
 	 * @covers AmazonS3FileBackend::doSecureInternal
 	 * @covers AmazonS3FileBackend::doPublishInternal
+	 * @covers AmazonS3FileBackend::isSecure
+	 * @covers AmazonS3FileBackend::getCacheKey
+	 * @covers AmazonS3FileBackend::updateSecurityCache
 	 */
 	public function testSecureAndPublish() {
 		$dst = $this->getVirtualPath( 'Stored/File/2.txt' );

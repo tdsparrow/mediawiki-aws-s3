@@ -26,6 +26,10 @@ env:
     - secure: "Hn+vZLz5pP/VxWaUYjKXECUJ5uj+SfQKEQYBCzjDo+PAaFK57u9pyQt1YMHG1CbEVJYQMmtevShqmjjf1fWF/Yo8LHyQFT1F8ER+6Nf2cX405lHG1Aw9gvrTNTDQsyoxDkLGv4x8OeDyhqk5/KFExa6BLIFsF1w+2UuljLWetug6mQDPKlW0Z9ktUJil6hSeXdKmRQxoiMJF+6Jk8JQQ1cK2Vgn4xl+tAnZJhgqMsTD+4eVQPe02DdANBL7E44NKqkel917vP+hn0dHkJNOlLh0V7nJAXPu74E37FD6oPSJ4DDUPouYTJ8hgeb3O/x9tk7TjsZFyqu150xGJWj6WI05EoVRdPU5jyIo5INZ7WZVSp7xn9bPhX1J8K1owHnpfMMUl/boJvMp8FsfCnSY1UPySBN+D87clDksPfGyIC1r34FjIpZd2YTDhN9Ep7VOkJQf3bpu7BM9O/mC5M2Ymp0lXa60PfMjgpsjP86vjTMWPrpjjZNFR+9i0FaRXL7Mv/XpEDn+4I1esZIQ+9sfvwYRGI6cNaRKlHyJNjVpRAqlT/eCapNpf2M9Ci0/k6d+QgiB98b6S5i/Gua88cnfr5D976wGqddyea9Q+yaFt9UAT6VYuezdA/826cI440yLaYDHLIvBV9g72ywdFfCmDLtfDKek0AZOEwd7Jj3EHIPM="
 
 matrix:
+  fast_finish: true
+  allow_failures:
+    # Coverage calculation is optional.
+    - env: TESTSUITE_TYPE=coverage branch=REL1_34 USE_MOCK=1
   include:
       # Linters (phpcs, etc.)
     - &linter-php-build
@@ -78,6 +82,17 @@ matrix:
     - env: branch=REL1_27
       name: "PHPUnit: MW 1.27, PHP 5.6"
       php: 5.6
+    # Optional: use PHPUnit to calculate code coverage of consequence tests
+    - env: TESTSUITE_TYPE=coverage branch=REL1_34 USE_MOCK=1
+      name: "Code coverage: MW 1.34, PHP 7.4, USE_MOCK=1"
+      php: 7.4
+      script:
+        # Calculate code coverage.
+        # Note: "phpdbg" really likes to segfault on exit (after the coverage has already been generated), so we ignore exit code 139.
+        - export BUCKET=mocked
+        - phpdbg -qrr tests/phpunit/phpunit.php --coverage-text --coverage-clover coverage-report.xml --configuration extensions/AWS/tests/phpunit/coverage.suite.xml || [[ $? = 139 ]]
+      after_script:
+        - bash <(curl -s https://codecov.io/bash)
 
 cache:
   directories:

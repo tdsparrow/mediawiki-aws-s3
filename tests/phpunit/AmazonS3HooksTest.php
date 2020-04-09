@@ -49,6 +49,10 @@ class AmazonS3HooksTest extends MediaWikiTestCase {
 	public function testConfigIsLoaded() {
 		global $IP;
 
+		if ( strpos( PHP_BINARY, 'phpdbg' ) !== false ) {
+			$this->markTestSkipped( "This test doesn't support phpdbg." );
+		}
+
 		$tmpFilename = tempnam( sys_get_temp_dir(), '.configtest' );
 		file_put_contents( $tmpFilename,
 			'echo ( isset( $wgFileBackends["s3"] ) && ' .
